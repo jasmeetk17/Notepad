@@ -1,6 +1,6 @@
 from re import X
 import tkinter as tk
-from tkinter import BOTTOM, SUNKEN, ttk,font
+from tkinter import ttk,font
 from tkinter.filedialog import askopenfilename
 from PIL import Image,ImageTk
 
@@ -8,95 +8,16 @@ root=tk.Tk()
 root.title("Jasmeet's Notepad")
 root.geometry("1366x768")
 
-#exit the app
-def exit_app():
-    root.destroy()
-
-#images for toolbar
-bold_img=tk.PhotoImage(file='icon\\bold.png',width=24,height=24)
-italic_img=tk.PhotoImage(file='icon\\italic.png',width=24,height=24)
-underline_img=tk.PhotoImage(file='icon\\underline.png',width=24,height=24)
-align_left_img=tk.PhotoImage(file='icon\\align-left.png',width=24,height=24)
-align_right_img=tk.PhotoImage(file='icon\\align-right.png',width=24,height=24)
-align_center_img=tk.PhotoImage(file='icon\\align-center.png',width=24,height=24)
-align_justify_img=tk.PhotoImage(file='icon\\align-justify.png',width=24,height=24)
-
-#getting font
-fon = tk.font.families()
-fam = tk.StringVar()
-
-def open_status_bar():
-    statusbar = tk.Label(root, text="No of Words: ", bd=1, relief=tk.SUNKEN, anchor=tk.W)
-    statusbar.pack(side=tk.BOTTOM, fill=tk.X)
-
-def open_tool_bar():
-    def close_tool_bar():
-        tool_bar.destroy()
-
-    #create frame
-    tool_bar=tk.Frame(root,width=320,height=90,padx=10, pady=10,highlightbackground='blue',highlightthickness=1)
-
-
-    #create combobox
-    fbox = ttk.Combobox(tool_bar,width=30,textvariable=fam,state='readonly')
-    fbox['value'] = fon
-    fbox.place(x=1,y=5)
-    fbox.set('System')
-
-    #font size
-    size_combo = ttk.Combobox(tool_bar,width=10,state='readonly')
-    size_combo['values'] = ("8","9", "10","11","12", "14", "16", "18", "20","22","24","26","28","30","32","34","36","48","74")
-    size_combo.place(x=120,y=28)
-    size_combo.set('8')
-
-    close_btn=tk.Button(tool_bar,text='Close',width=10,height=0,bd=0,font=('Bold',10),foreground='white',
-                        background='red',command=close_tool_bar)
-    close_btn.place(x=120,y=50)
-
-    #font style section
-    
-    bold=tk.Button(tool_bar,image=bold_img)
-    bold.place(x=1,y=30)
-
-    
-    italic=tk.Button(tool_bar,image=italic_img)
-    italic.place(x=41,y=30)
-
-    
-    underline=tk.Button(tool_bar,image=underline_img)
-    underline.place(x=81,y=30)
-
-    #alignment section
-    
-    align_left=tk.Button(tool_bar,image=align_left_img)
-    align_left.place(x=220,y=1)
-
-    align_right=tk.Button(tool_bar,image=align_right_img)
-    align_right.place(x=260,y=1)
-
-    
-    align_center=tk.Button(tool_bar,image=align_center_img)
-    align_center.place(x=220,y=35)
-
-    
-    align_justify=tk.Button(tool_bar,image=align_justify_img)
-    align_justify.place(x=260,y=35)
-
-    
-
-    tool_bar.place(x=60,y=2)
-
-
-    
-
-
 
 #creating starting menu for file
 menu_bar = tk.Menu()
 
-
 #file menu 
 file = tk.Menu(menu_bar,tearoff=False)
+
+#exit the app
+def exit_app():
+    root.destroy()
 
 #file menu images
 save = tk.PhotoImage(file='icon\\save.png',width=24,height=24)
@@ -119,6 +40,20 @@ menu_bar.add_cascade(label="File",menu=file)
 
 view = tk.Menu(menu_bar,tearoff=False)
 
+#images for toolbar
+bold_img=tk.PhotoImage(file='icon\\bold.png',width=24,height=24)
+italic_img=tk.PhotoImage(file='icon\\italic.png',width=24,height=24)
+underline_img=tk.PhotoImage(file='icon\\underline.png',width=24,height=24)
+align_left_img=tk.PhotoImage(file='icon\\align-left.png',width=24,height=24)
+align_right_img=tk.PhotoImage(file='icon\\align-right.png',width=24,height=24)
+align_center_img=tk.PhotoImage(file='icon\\align-center.png',width=24,height=24)
+align_justify_img=tk.PhotoImage(file='icon\\align-justify.png',width=24,height=24)
+
+#status bar 
+def open_status_bar():
+    statusbar = tk.Label(root, text="No of Words: ", bd=1, relief=tk.SUNKEN, anchor=tk.W)
+    statusbar.pack(side=tk.BOTTOM, fill=tk.X)
+
 #view menu images
 zoomin = tk.PhotoImage(file='icon\\zoom-in.png',width=24,height=24)
 zoomout = tk.PhotoImage(file='icon\\zoom-out.png',width=24,height=24)
@@ -128,7 +63,6 @@ statusbar=tk.PhotoImage(file='icon\\statusbar.png',width=24,height=24)
 view.add_command(label="Zoom",accelerator="ctrl+plus",image=zoomin,compound="left")
 view.add_command(label="Zoom In",accelerator="ctrl+minus",image=zoomout,compound="left")
 view.add_command(label="Status Bar",accelerator="ctrl+shift+s",image=statusbar,compound="left",command=open_status_bar)
-view.add_command(label="Tool Bar",accelerator="ctrl+shift+t",image=toolbar,compound="left",command=open_tool_bar)
 menu_bar.add_cascade(label="View",menu=view)
 
 
@@ -172,13 +106,120 @@ color.add_command(label="Violet",image=violet,compound="left")
 
 menu_bar.add_cascade(label="Color",menu=color)
 
+#getting font
+
+toolbar=ttk.Label(root)
+toolbar.pack(side=tk.TOP,fill=tk.X)
+
+#font box
+font_style = tk.font.families()
+font_style1 = tk.StringVar()
+
+font_box = ttk.Combobox(toolbar,textvariable=font_style1,width=20,state="readonly")
+font_box['values'] = font_style
+font_box.current(font_style.index('Arial'))
+font_box.grid(row=0,column=0,padx=5)
+
+
+#size for font
+size=list(range(8,75))
+font_size= tk.IntVar()
+
+font_size_box= ttk.Combobox(toolbar,textvariable=font_size,width=20,state="readonly")
+font_size_box['values'] = size
+font_size_box.current(size.index(8))
+font_size_box.grid(row=0,column=1,padx=5)
+
+
+text_area=tk.Text(root,width=1366,height=766)
+text_area.config(wrap="word",relief=tk.FLAT)
+text_area.place(x=0,y=24)
+
+font_var='Arial'
+size_var=8
+
+#change the font family
+def change_font(root):
+    global font_var
+    font_var=font_style1.get()
+    text_area.configure(font=(font_var,size_var))
+
+def change_size(root):
+    global size_var
+    size_var=font_size.get()
+    text_area.configure(font=(font_var,size_var))
+
+font_box.bind("<<ComboboxSelected>>",change_font)
+font_size_box.bind("<<ComboboxSelected>>",change_size)
+
+#font style section
+bold=tk.Button(toolbar,image=bold_img,width=15,height=15)
+bold.grid(row=0,column=3,padx=5)
 
 
 
+def change_bold():
+    text_change = tk.font.Font(root,text_area['font'])
+    if text_change.actual()['weight'] == 'normal':
+        text_area.configure(font=(font_var,size_var,"bold"))
+    elif text_change.actual()['weight'] == 'bold':
+        text_area.configure(font=(font_var,size_var,"normal"))
+
+bold.configure(command=change_bold)
+
+italic=tk.Button(toolbar,image=italic_img,width=15,height=15)
+italic.grid(row=0,column=4,padx=5)
+
+def change_italic():
+    text_change = tk.font.Font(root,text_area['font'])
+    if text_change.actual()['slant'] == 'roman':
+        text_area.configure(font=(font_var,size_var,"italic"))
+    elif text_change.actual()['slant'] == 'italic':
+        text_area.configure(font=(font_var,size_var,"normal"))
+
+italic.configure(command=change_italic)
+
+underline=tk.Button(toolbar,image=underline_img,width=15,height=15)
+underline.grid(row=0,column=5,padx=5)
+
+def change_underline():
+    text_change = tk.font.Font(root,text_area['font'])
+    if text_change.actual()['weight'] == "normal":
+        text_area.configure(font=(font_var,size_var,"underline"))
+    elif text_change.actual()['weight'] == "underline":
+        text_area.configure(font=(font_var,size_var,"normal"))
+underline.configure(command=change_underline)
+
+#alignment section
+align_left=tk.Button(toolbar,image=align_left_img,width=15,height=15)
+align_left.grid(row=0,column=6,padx=5)
+
+
+align_right=tk.Button(toolbar,image=align_right_img,width=15,height=15)
+align_right.grid(row=0,column=7,padx=5)
+
+def align_center_text():
+    text_area.configure(justify='center')
+   
+align_center=tk.Button(toolbar,image=align_center_img,width=15,height=15,command=align_center_text)
+align_center.grid(row=0,column=8,padx=5)
+
+    
+align_justify=tk.Button(toolbar,image=align_justify_img,width=15,height=15)
+align_justify.grid(row=0,column=9,padx=5)
+
+
+
+#scroll bar
+scroll_bar=tk.Scrollbar(root)
+text_area.focus_set()
+scroll_bar.pack(side=tk.RIGHT,fill=tk.Y)
+text_area.pack(side=tk.LEFT,expand=True)
+scroll_bar.config(command=text_area.yview)
+text_area.config(yscrollcommand=scroll_bar.set)
+
+text_area.configure(font=('Arial',8))
 
 
 root.config(menu=menu_bar)
-
-
-
 root.mainloop()
