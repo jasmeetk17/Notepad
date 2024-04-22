@@ -8,6 +8,10 @@ root=tk.Tk()
 root.title("Jasmeet's Notepad")
 root.geometry("1366x768")
 
+text_area=tk.Text(root,width=1366,height=766)
+text_area.config(wrap="word",relief=tk.FLAT)
+text_area.place(x=0,y=24)
+
 
 #creating starting menu for file
 menu_bar = tk.Menu()
@@ -87,6 +91,14 @@ menu_bar.add_cascade(label="Edit",menu=edit)
 #edit menu with cascade
 color = tk.Menu(menu_bar,tearoff=False)
 
+color_code={"Red":"#FF0000",
+            "Orange":"#FFA500",
+            "Yellow":"#FFF200",
+            "Green":"#008000",
+            "Blue":"#0000FF",
+            "Indigo":"#4b0082",
+            "Voilet":"#7f00ff" }
+
 #color images
 red = tk.PhotoImage(file='icon\\color-mode-red.png',width=24,height=24)
 orange = tk.PhotoImage(file='icon\\color-mode-orange.png',width=24,height=24)
@@ -96,13 +108,41 @@ blue = tk.PhotoImage(file='icon\\color-mode-blue.png',width=24,height=24)
 indigo = tk.PhotoImage(file='icon\\color-mode-indigo.png',width=24,height=24)
 violet = tk.PhotoImage(file='icon\\color-mode-violet.png',width=24,height=24)
 
-color.add_command(label="Red",image=red,compound="left")
-color.add_command(label="Orange",image=orange,compound="left")
-color.add_command(label="Yellow",image=yellow,compound="left")
-color.add_command(label="Green",image=green,compound="left")
-color.add_command(label="Blue",image=blue,compound="left")
-color.add_command(label="Indigo",image=indigo,compound="left")
-color.add_command(label="Violet",image=violet,compound="left")
+def red_color():
+    text_area.configure(bg=color_code['Red'])
+
+color.add_command(label="Red",image=red,compound="left",command=red_color)
+
+def orange_color():
+    text_area.configure(bg=color_code['Orange'])
+
+color.add_command(label="Orange",image=orange,compound="left",command=orange_color)
+
+def yellow_color():
+    text_area.configure(bg=color_code['Yellow'])
+
+color.add_command(label="Yellow",image=yellow,compound="left",command=yellow_color)
+
+def green_color():
+    text_area.configure(bg=color_code['Green'])
+
+color.add_command(label="Green",image=green,compound="left",command=green_color)
+
+def blue_color():
+    text_area.configure(bg=color_code['Blue'])
+
+color.add_command(label="Blue",image=blue,compound="left",command=blue_color)
+
+def indigo_color():
+    text_area.configure(bg=color_code['Indigo'])
+
+color.add_command(label="Indigo",image=indigo,compound="left",command=indigo_color)
+
+def voilet_color():
+    text_area.configure(bg=color_code['Voilet'])
+
+color.add_command(label="Violet",image=violet,compound="left",command=voilet_color)
+
 
 menu_bar.add_cascade(label="Color",menu=color)
 
@@ -130,10 +170,6 @@ font_size_box['values'] = size
 font_size_box.current(size.index(8))
 font_size_box.grid(row=0,column=1,padx=5)
 
-
-text_area=tk.Text(root,width=1366,height=766)
-text_area.config(wrap="word",relief=tk.FLAT)
-text_area.place(x=0,y=24)
 
 font_var='Arial'
 size_var=8
@@ -190,23 +226,42 @@ def change_underline():
         text_area.configure(font=(font_var,size_var,"normal"))
 underline.configure(command=change_underline)
 
+         
 #alignment section
-align_left=tk.Button(toolbar,image=align_left_img,width=15,height=15)
-align_left.grid(row=0,column=6,padx=5)
+def align_left():
+   start = "1.0"
+   end = "end"
+   text_area.tag_configure("left",justify='left')
+   text_area.tag_add("left",start,end)
+
+align_left_btn=tk.Button(toolbar,image=align_left_img,width=15,height=15)
+align_left_btn.grid(row=0,column=6,padx=5)
+align_left_btn.configure(command=align_left)
 
 
-align_right=tk.Button(toolbar,image=align_right_img,width=15,height=15)
-align_right.grid(row=0,column=7,padx=5)
+def align_right():
+   start = "1.0"
+   end = "end"
+   text_area.tag_configure("right",justify='right')
+   text_area.tag_add("right",start,end)
 
-def align_center_text():
-    text_area.configure(justify='center')
-   
-align_center=tk.Button(toolbar,image=align_center_img,width=15,height=15,command=align_center_text)
-align_center.grid(row=0,column=8,padx=5)
+align_right_btn=tk.Button(toolbar,image=align_right_img,width=15,height=15)
+align_right_btn.grid(row=0,column=7,padx=5)
+align_left_btn.configure(command=align_right)
 
-    
-align_justify=tk.Button(toolbar,image=align_justify_img,width=15,height=15)
-align_justify.grid(row=0,column=9,padx=5)
+def align_center():
+   start = "1.0"
+   end = "end"
+   text_area.tag_configure("center", justify='center')
+   text_area.tag_add("center",start,end)
+
+align_center_btn=tk.Button(toolbar,image=align_center_img,width=15,height=15)
+align_center_btn.grid(row=0,column=8,padx=5)
+align_left_btn.configure(command=align_center)
+
+
+align_justify_btn=tk.Button(toolbar,image=align_justify_img,width=15,height=15)
+align_justify_btn.grid(row=0,column=9,padx=5)
 
 
 
