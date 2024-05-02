@@ -1,17 +1,20 @@
 from re import X
 import tkinter as tk
 from tkinter import ttk,font
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfile
 from PIL import Image,ImageTk
 from tkinter import filedialog
+import os
 
 root=tk.Tk()
 root.title("Jasmeet's Notepad")
 root.geometry("1366x768")
 
-text_area=tk.Text(root,width=220,height=700)
+text_area=tk.Text(root,width=300,height=900)
 text_area.config(wrap="word",relief=tk.FLAT)
-text_area.place(x=0,y=24)
+text_area.place(x=0,y=15)
+
+opened_file_name=None
 
 #creating starting menu for file
 menu_bar = tk.Menu()
@@ -19,64 +22,100 @@ menu_bar = tk.Menu()
 #file menu 
 file = tk.Menu(menu_bar,tearoff=False)
 
-#exit the app
-def exit_app():
-    root.destroy()
-    
+#open new tab   
 new = tk.PhotoImage(file='icon\\file-add.png',width=24,height=24)
 
 n=''  
-#new tab open
 def new_window(event=None):
     global n
     n=' '
     text_area.delete(1.0,tk.END)
 
 file.add_command(label="New",image=new,command=new_window,accelerator="Ctrl+N",compound="left")
+
+#save the file with same name
 save = tk.PhotoImage(file='icon\\save.png',width=24,height=24)
 
 def save_file(event=None):
-    global n
+    global opened_file_name
 
-    try:
-        if n:
-            content = str(text_area.get(1.0,tk.END))
-            with open(n,"w",encoding="utf-8") as f:
+    content = text_area.get(1.0, tk.END)
+    if opened_file_name is not None:
+        # Save to the previously opened file
+        try:
+            with open(opened_file_name, 'w') as f:
                 f.write(content)
-        else:
-            n = filedialog.asksaveasfile(mode="w",defaultextension=".txt", filetypes=(("Text files", "*.txt"), ("All files", "*.*")))
-            content1 = text_area.get(1.0,tk.END)
-            n.write(content1)
-            n.close()
-    except:
-        print("file not save")            
+            print("File saved successfully.")
+        except Exception as e:
+            print(f"Error saving file: {e}")
+    else:
+        # If no file was opened, fall back to Save As functionality
+        save_as_file(event)
+
+
 file.add_command(label="Save",accelerator="Ctrl+S",image=save,command=save_file,compound="left")
 
+open_icon= tk.PhotoImage(file='icon\\file.png',width=24,height=24)
+
+#open the file
+def open_file(event=None):
+    global n,opened_file_name
+    n = filedialog.askopenfile(mode="r", defaultextension=".txt", filetypes=(("Text files", "*.txt"), ("All files", "*.*")))
+    if n is not None:
+        file_name = n.name
+        opened_file_name=n.name
+        print(f"Attempting to open file: {file_name}")
+        print(f"Current working directory: {os.getcwd()}")
+        try:
+            with open(file_name, 'r') as f:
+                content = f.read()
+                print(content)
+                # Assuming 'text_area' is your tkinter Text widget
+                text_area.delete(1.0, tk.END)
+                text_area.insert(tk.END, content)
+        except FileNotFoundError:
+            print(f"File not found: {file_name}")
+        finally:
+            n.close()
+    else:
+        print("No file selected.")
+
+file.add_command(label="Open",accelerator="ctrl+o",image=open_icon,command=open_file,compound="left")
 
 
-
-'''
-    content=text_area.get(1.0,tk.END)
-   # Open a file dialog to save the file
-    new_file = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
-     # Write the content to the file
-
-        if new_file:
-            with open(new_file, "w") as a:
-                content=str(text_area.get(1.0,tk.END))
-                a.write(content)
-                a.close()
-'''  
-#file menu images
-open = tk.PhotoImage(file='icon\\file.png',width=24,height=24)
 save_as = tk.PhotoImage(file='icon\\save-as.png',width=24,height=24)
+
+#save the new file
+def save_as_file(event=None):
+    global opened_file_name
+
+    content = text_area.get(1.0, tk.END)
+    default_file_name = os.path.basename(opened_file_name) if opened_file_name else "Untitled.txt"
+
+    file = filedialog.asksaveasfile(mode="w", defaultextension=".txt", initialfile=default_file_name,filetypes=(("Text files", "*.txt"), ("All files", "*.*")))
+    if file is not None:
+        file.write(content)
+        opened_file_name = file.name # Update the opened_file_name variable
+        print("File saved successfully.")
+        file.close()
+    else:
+        print("No file selected for saving.")
+
+
+file.add_command(label="Save As",accelerator="ctrl+shift+s",image=save_as,command=save_as_file,compound="left")
+
 exit = tk.PhotoImage(file='icon\\exit.png',width=24,height=24)
 
-#file menu options with cascade
-
-file.add_command(label="Open",accelerator="ctrl+o",image=open,command=tk.LEFT,compound="left")
-file.add_command(label="Save As",accelerator="ctrl+shift+s",image=save_as,command=tk.LEFT,compound="left")
+#exit the app
+def exit_app(event=None):
+    root.destroy()
 file.add_command(label="Exit",accelerator="ctrl+e",image=exit,compound="left",command=exit_app)
+
+root.bind("<Control-n>", new_window)  # Ctrl+X for cut
+root.bind("<Control-o>", open_file)  # Ctrl+C for copy
+root.bind("<Control-s>",save_as_file)
+root.bind("<Control-Shift-s>",save_as_file)  # Ctrl+V for paste
+root.bind("<Control-e>", exit_app)  # Delete key for delete
 
 menu_bar.add_cascade(label="File",menu=file)
 
@@ -93,24 +132,6 @@ align_left_img=tk.PhotoImage(file='icon\\align-left.png',width=24,height=24)
 align_right_img=tk.PhotoImage(file='icon\\align-right.png',width=24,height=24)
 align_center_img=tk.PhotoImage(file='icon\\align-center.png',width=24,height=24)
 
-
-#status bar 
-def open_status_bar():
-    statusbar = tk.Label(root, text="No of Words: ", bd=1, relief=tk.SUNKEN, anchor=tk.W)
-    statusbar.pack(side=tk.BOTTOM, fill=tk.X)
-
-#view menu images
-zoomin = tk.PhotoImage(file='icon\\zoom-in.png',width=24,height=24)
-zoomout = tk.PhotoImage(file='icon\\zoom-out.png',width=24,height=24)
-toolbar=tk.PhotoImage(file='icon\\tools.png',width=24,height=24)
-statusbar=tk.PhotoImage(file='icon\\statusbar.png',width=24,height=24)
-
-view.add_command(label="Zoom",accelerator="ctrl+plus",image=zoomin,compound="left")
-view.add_command(label="Zoom In",accelerator="ctrl+minus",image=zoomout,compound="left")
-view.add_command(label="Status Bar",accelerator="ctrl+shift+s",image=statusbar,compound="left",command=open_status_bar)
-menu_bar.add_cascade(label="View",menu=view)
-
-
 #edit menu with cascade
 edit = tk.Menu(menu_bar,tearoff=False)
 
@@ -121,11 +142,46 @@ paste = tk.PhotoImage(file='icon\\paste.png',width=24,height=24)
 delete = tk.PhotoImage(file='icon\\delete.png',width=24,height=24)
 undo = tk.PhotoImage(file='icon\\undo.png',width=24,height=24)
 
-edit.add_command(label="Cut",accelerator="ctrl+x",image=cut,compound="left")
+def cut_text(event=None):
+  if text_area.tag_ranges("sel"):
+    text = text_area.get("sel.first", "sel.last")  # Get the selected text
+    root.clipboard_clear()  # Clear the clipboard
+    root.clipboard_append(text)  # Copy the selected text to the clipboard
+    text_area.delete("sel.first", "sel.last")  # Delete the selected text from the widget
+  else:
+      pass
+
+edit.add_command(label="Cut",accelerator="ctrl+x",image=cut,compound="left",command=cut_text)
+
+def copy_text(event=None):
+    text = text_area.get("sel.first", "sel.last")  # Get the selected text
+    if text:
+        root.clipboard_clear()  # Clear the clipboard
+        root.clipboard_append(text)  # Copy the selected text to the clipboard
+
+
 edit.add_command(label="Copy",accelerator="ctrl+c",image=copy,compound="left")
-edit.add_command(label="Paste",accelerator="ctrl+v",image=paste,compound="left")
-edit.add_command(label="Delete",accelerator="ctrl+d",image=delete,compound="left")
-edit.add_command(label="Undo",accelerator="ctrl+u",image=undo,compound="left")
+
+def paste_text(event=None):
+    text_to_paste = root.clipboard_get()  # Get the content from the clipboard
+    text_area.insert(tk.INSERT, text_to_paste)  # Insert the content at the current cursor position
+
+edit.add_command(label="Paste",accelerator="ctrl+v",image=paste,compound="left",command=paste_text)
+
+def delete_text(event=None):
+    # Get the current selection indices
+    start_index = text_area.index("sel.first")
+    end_index = text_area.index("sel.last")
+    # Delete the selected text
+    text_area.delete(start_index, end_index)
+
+edit.add_command(label="Delete",accelerator="ctrl+d",image=delete,compound="left",command=delete_text)
+
+
+root.bind("<Control-x>", cut_text)  # Ctrl+X for cut
+root.bind("<Control-c>", copy_text)  # Ctrl+C for copy
+root.bind("<Control-v>", paste_text)  # Ctrl+V for paste
+root.bind("<Control-d>", delete_text)  # Delete key for delete
 
 menu_bar.add_cascade(label="Edit",menu=edit)
 
@@ -152,51 +208,37 @@ violet = tk.PhotoImage(file='icon\\color-mode-violet.png',width=24,height=24)
 #add red color
 def red_color():
     text_area.configure(bg=color_code['Red'])
-    
-    
 
 color.add_command(label="Red",image=red,compound="left",command=red_color)
 
 #add orange color
 def orange_color():
     text_area.configure(bg=color_code['Orange'])
-   
-
 color.add_command(label="Orange",image=orange,compound="left",command=orange_color)
 
 #add yellow color
 def yellow_color():
     text_area.configure(bg=color_code['Yellow'])
-   
-
 color.add_command(label="Yellow",image=yellow,compound="left",command=yellow_color)
 
 #add green color
 def green_color():
     text_area.configure(bg=color_code['Green'])
-
-
 color.add_command(label="Green",image=green,compound="left",command=green_color)
 
 #add blue color
 def blue_color():
     text_area.configure(bg=color_code['Blue'])
-    
-
 color.add_command(label="Blue",image=blue,compound="left",command=blue_color)
 
 #add indigo color
 def indigo_color():
     text_area.configure(bg=color_code['Indigo'])
-    
-
 color.add_command(label="Indigo",image=indigo,compound="left",command=indigo_color)
 
 #add voilet color
 def voilet_color():
     text_area.configure(bg=color_code['Voilet'])
-    
-
 color.add_command(label="Violet",image=violet,compound="left",command=voilet_color)
 
 menu_bar.add_cascade(label="Background Color ",menu=color)
@@ -377,10 +419,7 @@ def align_left():
     text_area.tag_configure("center",justify='left')
     text_area.tag_add("center",start,end)
    
-
-
 align_left_btn.configure(command=align_left)
-
 
 #right alignment 
 align_right_btn=tk.Button(toolbar,image=align_right_img,width=15,height=15)
